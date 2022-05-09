@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Video.js</title>
+        <meta charset="UTF-8" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <link href="src/css/video-js.min.css" rel="stylesheet" />
+        <link href="src/css/videojs-seek-buttons.css" rel="stylesheet" />
+        <link href="src/css/videojs-skip-button.css" rel="stylesheet" />
+
+        <script src="src/js/video.min.js"></script>
+        <script src="src/js/videojs-seek-buttons.min.js"></script>
+        <script src="src/js/videojs-skip-button.min.js"></script>
+        <script src="src/js/videojs-plugin-audio-switch.js"></script>
+    </head>
+
+    <body>
+        <style>
+            .vjs-fg-skip-button:hover {
+                background-color: #009e95;
+            }
+            .my_button {
+                position: absolute !important;
+                right: 10px !important;
+                top: 10px;
+                height: unset !important;
+                border: 1px solid black !important;
+                border-color: white !important;
+                color: white !important;
+                padding: 10px 10px !important;
+                cursor: pointer !important;
+                font-size: 12px !important;
+                max-width: max-content !important;
+                width: max-content !important;
+            }
+            .my_button:hover {
+                background: rgba(43, 51, 63, 0.7);
+                color: white !important;
+            }
+        </style>
+        <center style="margin-top:40px;">
+            <video
+                id="example_video_1"
+                class="video-js vjs-big-play-centered"
+                controls
+                preload="none"
+                width="640"
+                height="264"
+                poster="http://vjs.zencdn.net/v/oceans.png"
+                data-setup="{}"
+                playbackRates="[0.5, 1, 1.5, 2]"
+            >
+                <source src="src/video/oceans_nosound.mp4" type="video/mp4" />
+
+                <track
+                    kind="captions"
+                    src="src/caption/example-captions.vtt"
+                    srclang="en"
+                    label="English"
+                />
+                <track
+                    kind="subtitles"
+                    src="src/caption/example-captions-th.vtt"
+                    srclang="th"
+                    label="Thai"
+                />
+            </video>
+        </center>
+    </body>
+
+    <script>
+        const audio_list = [
+            {
+                language: "th",
+                label: "th",
+                kind: "main",
+                id: "th",
+                url: "src/audio/oceans.mp3",
+                enabled: true
+            },
+            {
+                language: "en",
+                label: "en",
+                kind: "main",
+                id: "en",
+                url: "src/audio/file_example_MP3_700KB.mp3",
+                enabled: false
+            }
+        ];
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const time = urlParams.get("time");
+        var player = videojs("example_video_1", {
+            playbackRates: [0.5, 1, 1.5, 2],
+
+            plugins: {
+                // setting  audio track
+                "audio-switch": {
+                    audioTracks: audio_list
+                    // debugInterval: 2000,
+                    //syncInterval: 2000
+                }
+            }
+        });
+        var track = null;
+
+        audio_list.forEach(row => {
+            track = null;
+            track = new videojs.AudioTrack({
+                language: row.language,
+                label: row.label,
+                kind: row.kind,
+                id: row.id + "-p",
+                url: row.url,
+                enabled: row.enabled
+            });
+            player.audioTracks().addTrack(track);
+            row.delete_track = player.audioTracks().getTrackById(row.id);
+            player.audioTracks().removeTrack(row.delete_track);
+        });
+        /*  var track1 = new videojs.AudioTrack({
+            language: "th",
+            label: "th",
+            kind: "main",
+            id: "th",
+            url: "src/audio/oceans.mp3",
+            enabled: true
+        });
+        var track2 = new videojs.AudioTrack({
+            language: "en",
+            label: "en",
+            kind: "main",
+            id: "en",
+            url: "src/audio/file_example_MP3_700KB.mp3",
+            enabled: false
+        });
+
+        player.audioTracks().addTrack(track1);
+        player.audioTracks().addTrack(track2);
+        var track3 = player.audioTracks().getTrackById("th-p");
+        var track4 = player.audioTracks().getTrackById("en-p");
+        player.audioTracks().removeTrack(track3);
+        player.audioTracks().removeTrack(track4); */
+
+        if (time > 0) {
+            player.currentTime(time);
+        }
+
+        // ข้ามไปข้างหน้า/หลัง หน่วยเป็นวินาที
+        player.seekButtons({
+            forward: 5,
+            back: 5
+        });
+
+        // เมื่อวีดิโอเล่นจบ
+        player.on("ended", function() {
+            setTimeout(() => {
+                location.reload();
+            }, 5000);
+        });
+
+        // setting ปุ่มเล่นตอนถัดไป
+        this.player.one("loadedmetadata", () => {
+            var duration = this.player.duration();
+            player.skipButton({
+                text: "ตอนถัดไป",
+                from: 20, // วินาทีที่ให้ปุ่มขึ้นแสดง
+                to: duration,
+                url: window.location.href, // URL ตอนถัดไป
+                position: "bottom-right",
+                offsetH: 26,
+                offsetV: 46
+            });
+        });
+    </script>
+</html>
