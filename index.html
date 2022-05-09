@@ -92,7 +92,8 @@
         ];
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        const time = urlParams.get("time");
+        const time = urlParams.get("time"); // เล่นต่อจากเวลาเดิม หน่วยวินาที
+        
         var player = videojs("example_video_1", {
             playbackRates: [0.5, 1, 1.5, 2],
 
@@ -121,30 +122,8 @@
             row.delete_track = player.audioTracks().getTrackById(row.id);
             player.audioTracks().removeTrack(row.delete_track);
         });
-        /*  var track1 = new videojs.AudioTrack({
-            language: "th",
-            label: "th",
-            kind: "main",
-            id: "th",
-            url: "src/audio/oceans.mp3",
-            enabled: true
-        });
-        var track2 = new videojs.AudioTrack({
-            language: "en",
-            label: "en",
-            kind: "main",
-            id: "en",
-            url: "src/audio/file_example_MP3_700KB.mp3",
-            enabled: false
-        });
-
-        player.audioTracks().addTrack(track1);
-        player.audioTracks().addTrack(track2);
-        var track3 = player.audioTracks().getTrackById("th-p");
-        var track4 = player.audioTracks().getTrackById("en-p");
-        player.audioTracks().removeTrack(track3);
-        player.audioTracks().removeTrack(track4); */
-
+        
+        // เล่นต่อจากวินาทีเดิม
         if (time > 0) {
             player.currentTime(time);
         }
